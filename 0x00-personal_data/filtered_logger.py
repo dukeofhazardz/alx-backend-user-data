@@ -7,7 +7,7 @@ from logging import StreamHandler
 import logging
 from mysql.connector import connection
 
-PII_FIELDS: tuple = ("email", "phone", "ssn", "password", "ip")
+PII_FIELDS: tuple = ("name", "email", "phone", "ssn", "ip")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -39,7 +39,8 @@ def filter_datum(fields: List[str], redaction: str,
 
 def get_logger() -> logging.Logger:
     """ A function that returns a logging.Logger object. """
-    logger = logging.LogRecord("user_data", logging.INFO)
+    logger = logging.LogRecord("user_data")
+    logger.setLevel(logging.INFO)
     logger.propagate = False
 
     handler = StreamHandler()
@@ -51,12 +52,16 @@ def get_logger() -> logging.Logger:
 def get_db() -> connection.MySQLConnection:
     """ A function that returns a connector to the database
         (mysql.connector.connection.MySQLConnection object) """
-    conx = connection.MySQLConnection(user=os.getenv
-                                      ("PERSONAL_DATA_DB_USERNAME"),
-                                      password=os.getenv
-                                      ("PERSONAL_DATA_DB_PASSWORD"),
-                                      host=os.getenv
-                                      ("PERSONAL_DATA_DB_HOST"),
-                                      database=os.getenv
-                                      ("PERSONAL_DATA_DB_NAME"))
+    username: str = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password: str = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host: str = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    database: str = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    if not database:
+        raise ValueError("Database env not set")
+    
+    conx = connection.MySQLConnection(user=username,
+                                      password=password,
+                                      host=host,
+                                      database=database)
     return conx

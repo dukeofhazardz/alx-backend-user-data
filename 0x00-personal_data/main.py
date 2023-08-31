@@ -32,7 +32,7 @@ print("PII_FIELDS: {}".format(len(PII_FIELDS)))
 
 # 4
 get_db = __import__('filtered_logger').get_db
-
+print(get_db.__annotations__.get('return'))
 db = get_db()
 cursor = db.cursor()
 cursor.execute("SELECT COUNT(*) FROM users;")
