@@ -39,13 +39,15 @@ def filter_datum(fields: List[str], redaction: str,
 
 def get_logger() -> logging.Logger:
     """ A function that returns a logging.Logger object. """
-    logger = logging.LogRecord("user_data")
-    logger.setLevel(logging.INFO)
+    logger = logging.getLogger("user_data")
     logger.propagate = False
 
     handler = StreamHandler()
-    handler.setFormatter(RedactingFormatter(fields=PII_FIELDS))
+    formatter = RedactingFormatter(fields=PII_FIELDS)
+    handler.setFormatter(formatter)
+    
     logger.addHandler(handler)
+
     return logger
 
 
@@ -55,7 +57,7 @@ def get_db() -> connection.MySQLConnection:
     username: str = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
     password: str = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
     host: str = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    database: str = os.getenv("PERSONAL_DATA_DB_NAME")
+    database: str = os.getenv("PERSONAL_DATA_DB_NAME", "holberton")
 
     if not database:
         raise ValueError("Database env not set")
@@ -73,9 +75,17 @@ def main() -> None:
     conx = get_db()
     cursor = conx.cursor()
     cursor.execute("SELECT * FROM users")
+
+    logger = get_logger()
+
     for row in cursor:
-        print(row)
+        log_record = logging.LogRecord("user_data", logging.INFO, None, None, row, None, None)
+        formatted_row = logger.handlers[0].format(log_record)
+        print(formatted_row)
+
     cursor.close()
+    conx.close()
 
 
-# main()
+if __name__ == "__main__":
+    main()
