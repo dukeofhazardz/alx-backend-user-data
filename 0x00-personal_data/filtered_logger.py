@@ -78,8 +78,11 @@ def main() -> None:
 
     logger = get_logger()
 
+    columns = [col[0] for col in cursor.description]
+
     for row in cursor:
-        log_record = logging.LogRecord("user_data", logging.INFO, None, None, row, None, None)
+        message = '; '.join((f"{c}={r}" for c, r in zip(columns, row)))
+        log_record = logging.LogRecord("user_data", logging.INFO, None, None, message, None, None)
         formatted_row = logger.handlers[0].format(log_record)
         print(formatted_row)
 
