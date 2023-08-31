@@ -78,4 +78,4 @@ def main() -> None:
     cursor.close()
 
 
-main()
+# main()
