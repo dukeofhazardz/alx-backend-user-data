@@ -7,7 +7,7 @@ from logging import StreamHandler
 import logging
 from mysql.connector import connection
 
-PII_FIELDS: tuple = ("name", "email", "phone", "ssn", "ip")
+PII_FIELDS: tuple = ("name", "email", "phone", "ssn", "password")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -59,9 +59,23 @@ def get_db() -> connection.MySQLConnection:
 
     if not database:
         raise ValueError("Database env not set")
-    
+
     conx = connection.MySQLConnection(user=username,
                                       password=password,
                                       host=host,
                                       database=database)
     return conx
+
+
+def main() -> None:
+    """ A function obtains a database connection using get_db and retrieve
+    all rows in the users table and display each row under a filtered format"""
+    conx = get_db()
+    cursor = conx.cursor()
+    cursor.execute("SELECT * FROM users")
+    for row in cursor:
+        print(row)
+    cursor.close()
+
+
+main()
