@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """ An implementation of Personal User Data """
 import re
+import os
 from typing import List
+from logging import StreamHandler
 import logging
+from mysql.connector import connection
+
+PII_FIELDS: tuple = ("email", "phone", "ssn", "password", "ip")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -30,3 +35,28 @@ def filter_datum(fields: List[str], redaction: str,
     """ A function that returns the log message obfuscated """
     pattern = rf'({"|".join(fields)})=[^{separator}]+'
     return re.sub(pattern, f'\\1={redaction}', message)
+
+
+def get_logger() -> logging.Logger:
+    """ A function that returns a logging.Logger object. """
+    logger = logging.LogRecord("user_data", logging.INFO)
+    logger.propagate = False
+
+    handler = StreamHandler()
+    handler.setFormatter(RedactingFormatter(fields=PII_FIELDS))
+    logger.addHandler(handler)
+    return logger
+
+
+def get_db() -> connection.MySQLConnection:
+    """ A function that returns a connector to the database
+        (mysql.connector.connection.MySQLConnection object) """
+    conx = connection.MySQLConnection(user=os.getenv
+                                      ("PERSONAL_DATA_DB_USERNAME"),
+                                      password=os.getenv
+                                      ("PERSONAL_DATA_DB_PASSWORD"),
+                                      host=os.getenv
+                                      ("PERSONAL_DATA_DB_HOST"),
+                                      database=os.getenv
+                                      ("PERSONAL_DATA_DB_NAME"))
+    return conx
