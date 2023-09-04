@@ -11,7 +11,6 @@ def status() -> str:
     Return:
       - the status of the API
     """
-    print("Executing")
     return jsonify({"status": "OK"})
 
 
@@ -25,3 +24,12 @@ def stats() -> str:
     stats = {}
     stats['users'] = User.count()
     return jsonify(stats)
+
+
+@app_views.route('/unauthorized', strict_slashes=False)
+def unauthorized() -> None:
+    """ GET /api/v1/unauthorized
+    Return:
+      None
+    """
+    abort(401, description="UNAUTHORIZED")
