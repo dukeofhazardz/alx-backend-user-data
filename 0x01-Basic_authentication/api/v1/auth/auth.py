@@ -25,12 +25,9 @@ class Auth:
         """ A public method that returns validate all requests to
             secure the API """
         if request is None or "Authorization" not in request.headers:
-            print("header None")
             return None
-        print("submitted header")
         return request.headers["Authorization"]
 
     def current_user(self, request=None) -> TypeVar('User'):
         """ A public method that returns None - request """
-        print("c user None")
         return None

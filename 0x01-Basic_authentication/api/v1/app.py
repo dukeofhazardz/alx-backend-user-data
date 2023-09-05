@@ -48,17 +48,14 @@ def forbidden(error) -> str:
 def before_request():
     """ Filters each request
     """
-    print(request)
     if auth is not None:
         exclude_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
                          '/api/v1/forbidden/']
         if auth.require_auth(request.path, exclude_paths) is False:
             return
         if auth.authorization_header(request) is None:
-            print("header None")
             abort(401, description="UNAUTHORIZED")
         if auth.current_user(request) is None:
-            print("current user returns none")
             abort(403, description="FORBIDDEN")
 
 

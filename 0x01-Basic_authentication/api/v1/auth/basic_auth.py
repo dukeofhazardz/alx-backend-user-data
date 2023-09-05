@@ -34,10 +34,11 @@ class BasicAuth(Auth):
             return None
         try:
             base64_decoded = base64.b64decode(base64_authorization_header)
-        except base64.binascii.Error:
+            utf_decoded = base64_decoded.decode('utf-8')
+        except (base64.binascii.Error, UnicodeDecodeError):
             return None
 
-        return base64_decoded.decode('utf-8')
+        return utf_decoded
 
     def extract_user_credentials(self,
                                  decoded_base64_authorization_header:
@@ -67,11 +68,33 @@ class BasicAuth(Auth):
         if user_pwd is None or not isinstance(user_pwd, str):
             return None
 
-        user = User()
-        if user.all():
-            user_list = user.search({'email': f'{user_email}'})
-        if user_list:
-            for each_user in user_list:
+        users = User().search({'email': f'{user_email}'})
+        if users:
+            for each_user in users:
                 if each_user.is_valid_password(user_pwd):
                     return each_user
                 return None
+            return None
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """ A method that overloads Auth and retrieves the User
+            instance for a request """
+        authorization_header = self.authorization_header(request)
+        if authorization_header is None or \
+                not authorization_header.startswith('Basic '):
+            return None
+
+        base64_auth = self.extract_base64_authorization_header(
+            authorization_header)
+        if base64_auth is None:
+            return None
+
+        decoded_auth = self.decode_base64_authorization_header(base64_auth)
+        if decoded_auth is None:
+            return None
+
+        user_credentials = self.extract_user_credentials(decoded_auth)
+        if user_credentials is None:
+            return None
+
+        return self.user_object_from_credentials(*user_credentials)
