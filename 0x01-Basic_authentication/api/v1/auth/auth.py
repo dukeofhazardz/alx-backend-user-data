@@ -34,8 +34,3 @@ class Auth:
         """ A public method that returns None - request """
         print("c user None")
         return None
-
-
-class BasicAuth(Auth):
-    """ The BasicAuth Class that inherits from the Auth Class """
-    pass
