@@ -21,6 +21,9 @@ if app.config['AUTH_TYPE'] == 'auth':
 elif app.config['AUTH_TYPE'] == 'basic_auth':
     from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
+elif app.config['AUTH_TYPE'] == 'session_auth':
+    from api.v1.auth.session_auth import SessionAuth
+    auth = SessionAuth()
 
 
 @app.errorhandler(404)
