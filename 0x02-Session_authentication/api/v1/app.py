@@ -53,14 +53,19 @@ def before_request():
     """
     if auth is not None:
         exclude_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
-                         '/api/v1/forbidden/']
+                         '/api/v1/forbidden/', '/api/v1/auth_session/login/']
         if auth.require_auth(request.path, exclude_paths) is False:
             return
         if auth.authorization_header(request) is None:
             abort(401, description="UNAUTHORIZED")
         if auth.current_user(request) is None:
             abort(403, description="FORBIDDEN")
+
         request.current_user = auth.current_user(request)
+
+        if auth.authorization_header(request) is None and \
+                auth.session_cookie(request) is None:
+            abort(401, description="UNAUTHORIZED")
 
 
 if __name__ == "__main__":
