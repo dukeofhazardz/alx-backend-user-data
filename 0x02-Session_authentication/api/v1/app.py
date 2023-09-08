@@ -63,11 +63,6 @@ def before_request():
 
         request.current_user = auth.current_user(request)
 
-        if not auth.session_cookie(request):
-            if auth.authorization_header(request) is None:
-                print("No authorization header")
-                abort(401, description="UNAUTHORIZED")
-
         if auth.authorization_header(request) is None and \
                 auth.session_cookie(request) is None:
             print("one of these is none")
