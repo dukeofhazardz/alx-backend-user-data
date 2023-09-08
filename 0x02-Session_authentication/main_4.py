@@ -31,5 +31,5 @@ def root_path():
         return "No user found\n"
     return "User found: {}\n".format(request_user.id)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5050")
+'''if __name__ == "__main__":
+    app.run(host="0.0.0.0", port="5050")'''
