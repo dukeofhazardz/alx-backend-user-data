@@ -56,21 +56,21 @@ def before_request():
                          '/api/v1/forbidden/', '/api/v1/auth_session/login/']
         if auth.require_auth(request.path, exclude_paths) is False:
             return
-        if not auth.user_id_by_session_id.get(auth.session_cookie(request)):
-            print(auth.user_id_by_session_id.get(auth.session_cookie(request)))
-            abort(403, description="FORBIDDEN")
-
-        if auth.authorization_header(request) is None:
-            abort(401, description="UNAUTHORIZED")
 
         if auth.current_user(request) is None:
+            print("Current user is none")
             abort(403, description="FORBIDDEN")
 
         request.current_user = auth.current_user(request)
 
+        if not auth.session_cookie(request):
+            if auth.authorization_header(request) is None:
+                print("No authorization header")
+                abort(401, description="UNAUTHORIZED")
+
         if auth.authorization_header(request) is None and \
                 auth.session_cookie(request) is None:
-            print(auth.authorization_header(request))
+            print("one of these is none")
             abort(401, description="UNAUTHORIZED")
 
 
