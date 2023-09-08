@@ -56,8 +56,8 @@ def before_request():
                          '/api/v1/forbidden/', '/api/v1/auth_session/login/']
         if auth.require_auth(request.path, exclude_paths) is False:
             return
-        if auth.session_cookie(request) not in \
-                auth.user_id_by_session_id.keys():
+        if not auth.user_id_by_session_id.get(auth.session_cookie(request)):
+            print(auth.user_id_by_session_id.get(auth.session_cookie(request)))
             abort(403, description="FORBIDDEN")
 
         if auth.authorization_header(request) is None:
@@ -70,6 +70,7 @@ def before_request():
 
         if auth.authorization_header(request) is None and \
                 auth.session_cookie(request) is None:
+            print(auth.authorization_header(request))
             abort(401, description="UNAUTHORIZED")
 
 
