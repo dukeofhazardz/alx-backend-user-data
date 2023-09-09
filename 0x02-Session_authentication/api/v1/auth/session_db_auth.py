@@ -17,14 +17,14 @@ class SessionDBAuth(SessionExpAuth):
         user_session = UserSession(user_id, session_id)
         user_session.save_to_file()
         return session_id
-    
+
     def user_id_for_session_id(self, session_id=None):
         """ A method that returns the User ID by requesting UserSession in
             the database based on session_id """
         user_session = UserSession()
         user = user_session.search({"session_id": session_id})
         return user[0].user_id
-    
+
     def destroy_session(self, request=None):
         """ A method that destroys the UserSession based on the Session ID
             from the request cookie """
