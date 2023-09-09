@@ -27,6 +27,10 @@ elif app.config['AUTH_TYPE'] == 'session_auth':
 elif app.config['AUTH_TYPE'] == 'session_exp_auth':
     from api.v1.auth.session_exp_auth import SessionExpAuth
     auth = SessionExpAuth()
+elif app.config['AUTH_TYPE'] == 'session_db_auth':
+    from api.v1.auth.session_db_auth import SessionDBAuth
+    auth = SessionDBAuth()
+
 
 
 @app.errorhandler(404)

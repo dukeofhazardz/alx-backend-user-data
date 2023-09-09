@@ -3,8 +3,6 @@
 """
 from api.v1.auth.session_auth import SessionAuth
 from datetime import datetime, timedelta
-from typing import TypeVar
-from models.user import User
 import os
 
 
@@ -12,10 +10,8 @@ class SessionExpAuth(SessionAuth):
     """ The SessionExpAuth Class """
     def __init__(self):
         """ Initializes the SessionExpAuth Class """
-        if not os.getenv("SESSION_DURATION") or not isinstance(
-                int(os.getenv("SESSION_DURATION")), int):
-            self.session_duration = 0
-        self.session_duration = int(os.getenv("SESSION_DURATION"))
+        super().__init__()
+        self.session_duration = int(os.getenv("SESSION_DURATION", 0))
 
     def create_session(self, user_id=None):
         """ A method that creates the session """
@@ -39,9 +35,9 @@ class SessionExpAuth(SessionAuth):
 
         if "created_at" not in session_dict.keys():
             return None
-
-        if session_dict.get("created_at") + timedelta(
-                seconds=self.session_duration) >= datetime.now():
-            return None
-
-        return session_dict.get("user_id")
+        
+        expire_time = session_dict.get("created_at") + timedelta(
+            seconds=self.session_duration)
+        if expire_time >= datetime.now():
+            return session_dict.get("user_id")
+        return None
